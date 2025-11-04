@@ -1,0 +1,156 @@
+// 📘 Experiment 2.3 – Java Programs Using Lambda Expressions and Stream Operations
+// 👨‍💻 Author: Abhinandan Bhardwaj
+// 🏫 Course: CU - Project Based Learning with Java
+
+import java.util.*;
+import java.util.stream.*;
+import java.util.Comparator;
+
+public class Experiment2_3 {
+    public static void main(String[] args) {
+
+        // ------------------ Part A ------------------
+        System.out.println("=== Part A: Sorting Employee Objects Using Lambda ===");
+
+        // Employee list
+        List<Employee> employees = new ArrayList<>();
+        employees.add(new Employee("Rohan", 28, 50000));
+        employees.add(new Employee("Abhinandan", 24, 60000));
+        employees.add(new Employee("Priya", 30, 55000));
+        employees.add(new Employee("Karan", 25, 45000));
+
+        System.out.println("\nOriginal List:");
+        employees.forEach(System.out::println);
+
+        // Sort by name
+        employees.sort((e1, e2) -> e1.getName().compareTo(e2.getName()));
+        System.out.println("\nSorted by Name:");
+        employees.forEach(System.out::println);
+
+        // Sort by age (ascending)
+        employees.sort(Comparator.comparing(Employee::getAge));
+        System.out.println("\nSorted by Age:");
+        employees.forEach(System.out::println);
+
+        // Sort by salary (descending)
+        employees.sort(Comparator.comparing(Employee::getSalary).reversed());
+        System.out.println("\nSorted by Salary (Descending):");
+        employees.forEach(System.out::println);
+
+
+        // ------------------ Part B ------------------
+        System.out.println("\n=== Part B: Filtering and Sorting Students Using Streams ===");
+
+        List<Student> students = Arrays.asList(
+                new Student("Abhinandan", 82),
+                new Student("Kriti", 74),
+                new Student("Ravi", 90),
+                new Student("Meena", 69),
+                new Student("Karan", 78)
+        );
+
+        System.out.println("\nStudents scoring above 75%, sorted by marks:");
+        students.stream()
+                .filter(s -> s.getMarks() > 75)
+                .sorted(Comparator.comparing(Student::getMarks))
+                .map(Student::getName)
+                .forEach(System.out::println);
+
+
+        // ------------------ Part C ------------------
+        System.out.println("\n=== Part C: Stream Operations on Product Dataset ===");
+
+        List<Product> products = Arrays.asList(
+                new Product("Laptop", 75000, "Electronics"),
+                new Product("Phone", 50000, "Electronics"),
+                new Product("Chair", 3000, "Furniture"),
+                new Product("Table", 7000, "Furniture"),
+                new Product("Pen", 30, "Stationery"),
+                new Product("Notebook", 80, "Stationery")
+        );
+
+        // Group by category
+        Map<String, List<Product>> groupedByCategory =
+                products.stream().collect(Collectors.groupingBy(Product::getCategory));
+
+        System.out.println("\nGrouped by Category:");
+        groupedByCategory.forEach((category, list) -> {
+            System.out.println(category + ": " + list);
+        });
+
+        // Most expensive product in each category
+        Map<String, Optional<Product>> maxByCategory =
+                products.stream().collect(Collectors.groupingBy(
+                        Product::getCategory,
+                        Collectors.maxBy(Comparator.comparing(Product::getPrice))
+                ));
+
+        System.out.println("\nMost Expensive Product in Each Category:");
+        maxByCategory.forEach((category, prod) ->
+                System.out.println(category + ": " + prod.get().getName() + " - ₹" + prod.get().getPrice())
+        );
+
+        // Average price of all products
+        double avgPrice = products.stream()
+                .collect(Collectors.averagingDouble(Product::getPrice));
+        System.out.println("\nAverage Price of All Products: ₹" + avgPrice);
+    }
+}
+
+// ======================= Employee Class =======================
+class Employee {
+    private String name;
+    private int age;
+    private double salary;
+
+    public Employee(String name, int age, double salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
+    }
+
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public double getSalary() { return salary; }
+
+    @Override
+    public String toString() {
+        return name + " (Age: " + age + ", Salary: ₹" + salary + ")";
+    }
+}
+
+// ======================= Student Class =======================
+class Student {
+    private String name;
+    private double marks;
+
+    public Student(String name, double marks) {
+        this.name = name;
+        this.marks = marks;
+    }
+
+    public String getName() { return name; }
+    public double getMarks() { return marks; }
+}
+
+// ======================= Product Class =======================
+class Product {
+    private String name;
+    private double price;
+    private String category;
+
+    public Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
+    public String getName() { return name; }
+    public double getPrice() { return price; }
+    public String getCategory() { return category; }
+
+    @Override
+    public String toString() {
+        return name + " (₹" + price + ")";
+    }
+}
